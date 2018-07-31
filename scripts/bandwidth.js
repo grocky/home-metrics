@@ -40,20 +40,27 @@ const client = new StatsD(statsHost, statsPort, `${prefix}.`, statsSuffix);
 console.log(`${new Date()} - Initializing test... ${prefix}`);
 
 const sendMetric = (metric, data) => {
-  client.gauge(metric, data, (err) => {
-    if (err) return console.error(err);
-    console.log(`${new Date()} - ${metric} sent - ${data}`);
-  })
+  console.log(`${new Date()} - ${metric} sending - ${data}`);
+
+  return new Promise((res, rej) => {
+    client.gauge(metric, data, (err) => {
+      if (err) {
+        console.error(err);
+        return rej(err);
+      }
+      console.log(`${new Date()} - ${metric} sent`);
+      return res();
+    });
+  });
 };
 
 const test = speedTest({maxTime: 5000});
 
-test.on('data', data => {
+test.on('data', async (data) => {
   const { speeds } = data;
   const { download, upload } = speeds;
-  sendMetric('upload', upload);
-  sendMetric('download', download);
   console.log(`${new Date()} - metrics fired`);
+  await Promise.all([sendMetric('upload', upload), sendMetric('download', download)]);
 });
 
 test.on('error', err => {
@@ -62,6 +69,6 @@ test.on('error', err => {
 });
 
 test.on('done', dataOverload => {
-  console.log('The speed test has completed successfully.');
+  console.log(`${new Date()} - The speed test has completed successfully.`);
   process.exit(0);
 });
