@@ -28,7 +28,8 @@ if (!validConnectionTypes.includes(connectionType)) {
   console.error(`The connection type should be one of: ${validConnectionTypes.join(', ')}`);
 }
 
-const host = process.argv[3] || os.hostname();
+let host = process.argv[3] || os.hostname();
+host = host.replace('.', '-');
 
 const prefix = [statsBasePrefix, connectionType, host]
   .filter(p => !!p)
