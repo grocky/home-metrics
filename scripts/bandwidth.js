@@ -29,7 +29,7 @@ if (!validConnectionTypes.includes(connectionType)) {
 }
 
 let host = process.argv[3] || os.hostname();
-host = host.replace('.', '-');
+host = host.replace(/\./g, '-');
 
 const prefix = [statsBasePrefix, connectionType, host]
   .filter(p => !!p)

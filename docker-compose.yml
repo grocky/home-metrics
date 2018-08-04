@@ -7,6 +7,7 @@ services:
       - "3002:80"
       - "2003:2003"
       - "8125:8125/udp"
+      - "8126:8126"
   grafana:
     container_name: grafana
     image: grafana/grafana
